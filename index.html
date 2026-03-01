@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -281,6 +280,20 @@
                 } catch (e) { setWordDetails({ ipa: "-", pos: "-", meaning: "エラー", explanation: "取得できませんでした" }); } finally { setIsFetchingDetails(false); }
             };
 
+            // 単語を手動で追加する関数
+            const handleAddWordToBank = (word, details) => {
+                if (!word || !details) return;
+                const newWord = {
+                    id: Date.now(),
+                    word: word,
+                    level: "My Word", // 手動登録であることを示すラベル
+                    ipa: details.ipa || "",
+                    meaning_ja: details.meaning || ""
+                };
+                setWordBank(prev => [newWord, ...prev]);
+                setSelectedWord(null); // 登録後に辞書モーダルを閉じる
+            };
+
             const analyze = async () => {
                 if (!recordedBlob) return;
                 setIsAnalyzing(true); setError(null);
@@ -433,6 +446,12 @@
                                                         <div className="bg-white/5 p-4 rounded-2xl shadow-inner border border-white/5">
                                                             <p className="font-bold text-lg mb-1">{wordDetails.meaning}</p><p className="text-sm opacity-80 italic leading-relaxed">{wordDetails.explanation}</p>
                                                         </div>
+                                                        <button 
+                                                            onClick={() => handleAddWordToBank(selectedWord, wordDetails)}
+                                                            className="w-full py-3 mt-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors border border-indigo-400"
+                                                        >
+                                                            <Icon name="words" /> 単語帳に登録する
+                                                        </button>
                                                     </div>
                                                 )}
                                             </div>
@@ -522,7 +541,7 @@
                                     <span className="bg-indigo-50 px-3 py-1 rounded-full text-xs font-black text-indigo-600 uppercase">{wordBank.length} Words</span>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
-                                    {wordBank.length === 0 ? <p className="col-span-2 text-center py-20 text-stone-300 italic font-medium">練習中にB2レベル以上の単語が自動抽出されます。</p> : wordBank.map(v => (
+                                    {wordBank.length === 0 ? <p className="col-span-2 text-center py-20 text-stone-300 italic font-medium">練習中にB2レベル以上の単語が自動抽出されます。<br/>または辞書から手動で登録できます。</p> : wordBank.map(v => (
                                         <div key={v.id} className="p-5 bg-stone-50 rounded-2xl border border-stone-100 group relative hover:shadow-lg transition-all border-l-4 border-l-indigo-600">
                                             <button onClick={() => setWordBank(wordBank.filter(item => item.id !== v.id))} className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-stone-300 hover:text-rose-500 transition-all"><Icon name="trash" /></button>
                                             <span className="text-xl font-black text-indigo-950 block tracking-tight mb-1">{v.word}</span>
