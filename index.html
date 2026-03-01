@@ -93,7 +93,6 @@
             const [text, setText] = useState("I was waiting for the train at Victoria Station when the heavens opened.\n\nIt's quite typical for London weather, isn't it?");
             
             const [isGenerating, setIsGenerating] = useState(false);
-            // 🚨 ここが抜けていたせいで真っ白になっていました！追加完了！🚨
             const [audioUrl, setAudioUrl] = useState(null); 
             
             const [selectedVoice, setSelectedVoice] = useState('Kore');
@@ -132,14 +131,18 @@
             const [history, setHistory] = useState(() => {
                 try {
                     const saved = localStorage.getItem('bt_history');
-                    return saved ? JSON.parse(saved) : [];
+                    if (!saved) return [];
+                    const parsed = JSON.parse(saved);
+                    return Array.isArray(parsed) ? parsed : [];
                 } catch (e) { return []; }
             });
 
             const [wordBank, setWordBank] = useState(() => {
                 try {
                     const saved = localStorage.getItem('bt_wordbank');
-                    return saved ? JSON.parse(saved) : [];
+                    if (!saved) return [];
+                    const parsed = JSON.parse(saved);
+                    return Array.isArray(parsed) ? parsed : [];
                 } catch (e) { return []; }
             });
 
@@ -397,7 +400,9 @@
                                                         <p key={lineIndex} className="mb-4 last:mb-0 leading-relaxed">
                                                             {line.split(/(\s+)/).map((w, wIndex) => {
                                                                 if (!w.trim()) return <span key={wIndex}>{w}</span>;
-                                                                return <span key={wIndex} onClick={() => handleWordClick(w)} className="cursor-pointer hover:bg-indigo-200 hover:text-indigo-900 rounded transition-colors inline-block">{w}</span>;
+                                                                return (
+                                                                    <span key={wIndex} onClick={() => handleWordClick(w)} className="cursor-pointer hover:bg-indigo-200 hover:text-indigo-900 rounded transition-colors inline-block">{w}</span>
+                                                                );
                                                             })}
                                                         </p>
                                                     ))}
@@ -451,7 +456,7 @@
                                         </div>
                                         
                                         {audioUrl && (
-                                            <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100">
+                                            <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 mt-4">
                                                 <audio ref={audioRef} src={audioUrl} controls className="w-full h-8" />
                                             </div>
                                         )}
